@@ -72,20 +72,21 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
 				String... arg0) {
 			String temp = "";
 			// TODO Auto-generated method stub
-			String json = HttpMethod.getData("gps");
-			try {
-//				myData = parseGetJson(new JSONArray(json));
-				
-				if(json.equals(null)) { 
-					temp = "";
-				}else {
-					readtxtLat.setText(json);
-					temp = "ok";
-				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return temp;
+			final String json = HttpMethod.getData("gps").replaceAll("%2c", ", ");
+			if(json.equals(null)) { 
+				temp = "";
+			}else {
+				MainActivity.this.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							readtxtLat.setText(json);
+						} catch (NullPointerException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				temp = "ok";
 			}
 			return temp;
 		}
@@ -93,9 +94,9 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
 			if(result.equals("ok")) {
-				Toast.makeText(myContext, "上傳成功", Toast.LENGTH_SHORT).show();
+				Toast.makeText(myContext, "查詢成功", Toast.LENGTH_SHORT).show();
 			}else {
-				Toast.makeText(myContext, "上傳失敗，請再試一次", Toast.LENGTH_SHORT).show();
+				Toast.makeText(myContext, "查詢失敗，請再試一次", Toast.LENGTH_SHORT).show();
 			}
 			pDialog.dismiss();
 		}
@@ -121,7 +122,7 @@ public class MainActivity extends Activity implements OnClickListener, LocationL
 				String... arg0) {
 			String temp = "";
 			// TODO Auto-generated method stub
-			String postStatus = HttpMethod.postData(latitude + ", " + longitude);
+			String postStatus = HttpMethod.postData(latitude + "," + longitude);
 			if(postStatus.equals("ok"))
 				return "ok";
 			
